@@ -1,5 +1,3 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
 First, run the development server:
@@ -16,21 +14,79 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Planned Sprints
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Sprint 1: Project Setup & Basic Voice Transcription
 
-## Learn More
+Goal: Get a working Next.js app with basic voice-to-text functionality.
 
-To learn more about Next.js, take a look at the following resources:
+Tasks:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Create a new Next.js app.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Implement a voice transcription component using the Web Speech API.
 
-## Deploy on Vercel
+Support Arabic (ar) language transcription.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Display real-time transcription on the UI.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Handle browser compatibility gracefully.
+
+# Sprint 2: Connect to Quran.com API
+Goal: Fetch Quranic verses to prepare for comparison.
+
+Tasks:
+
+Explore and understand Quran.com API.
+
+Implement API calls to:
+
+Get surah and ayah lists.
+
+Fetch Arabic text of a specific ayah.
+
+Create a basic UI to display a selected verse.
+
+# Sprint 3: Matching Transcription with Quranic Verses
+Goal: Compare user's voice transcription with selected ayah.
+
+Tasks:
+
+Normalize both transcription and verse (e.g., remove diacritics, punctuation).
+
+Use simple string similarity (e.g., Levenshtein distance) to show how closely the transcription matches.
+
+Display comparison results visually (e.g., percentage match, highlights).
+
+# Sprint 4: Verse Selection & Playback Tools
+Goal: Let users choose which verse to read and provide tools to assist.
+
+Tasks:
+
+Add dropdown/select for Surah and Ayah.
+
+Optionally embed Quran audio player (Quran.com supports audio links).
+
+Highlight the ayah that is currently selected for practice.
+
+# Sprint 5: User Feedback & Enhancements
+Goal: Improve usability and accessibility.
+
+Tasks:
+
+Improve UI/UX (loading states, error handling, responsive layout).
+
+Show feedback like “Good match!” or “Try again.”
+
+Log transcription attempts for analysis (optional).
+
+# Sprint 6: Advanced Features (Optional)
+Goal: Add polish and intelligent features.
+
+Tasks:
+
+Use fuzzy matching libraries (like fuse.js or string-similarity) for better comparison.
+
+Track learning progress for each verse (e.g., dashboard).
+
+Integrate authentication (if saving user progress).
