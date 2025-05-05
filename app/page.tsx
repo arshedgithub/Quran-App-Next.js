@@ -1,11 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
 
 export default function Home() {
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ua = navigator.userAgent;
+  
+      const isNotChrome =
+        !/Chrome/.test(ua) ||
+        /Brave|Edg|OPR|Opera|Firefox|Safari(?!.*Chrome)|MSIE|Trident/.test(ua);
+  
+      if (isNotChrome) {
+        setShowModal(true);
+      }
+    }
+  }, []);
 
   let recognition: SpeechRecognition | null = null;
 
@@ -67,6 +83,34 @@ export default function Home() {
         <p className="text-lg">📝 Transcription:</p>
         <p className="mt-2 text-right text-xl font-semibold text-gray-800">{transcript}</p>
       </div>
+
+      {/* inaccurate browser warning */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg max-w-md text-center">
+            <h2 className="text-xl font-bold mb-2 text-red-600">⚠️ Browser Warning</h2>
+            <p className="mb-4">This app may not work properly or accurately in browsers other than Chrome.</p>
+            <p className="mb-4 font-medium">Please use <span className="text-blue-600">Google Chrome</span> for the best experience.</p>
+            
+            <p className="mb-4">Or <br /> Download our mobile app for a better experience</p>
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 underline font-semibold"
+            >Download</a>
+            <div className="mt-4">
+              <button
+                onClick={() => setShowModal(false)}
+                className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700"
+              >
+                Continue Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
