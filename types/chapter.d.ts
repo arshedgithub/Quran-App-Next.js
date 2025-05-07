@@ -11,3 +11,17 @@ interface Chapter {
         language_name: string
     };
 }
+
+interface Verse {
+    id: number;
+    verse_number: number;
+    text_uthmani: string;
+    verse_key: string;
+    translations: { text: string }[];
+}
+
+interface ChapterInfo {
+    text: string;
+    short_text: string;
+    source: string;
+}

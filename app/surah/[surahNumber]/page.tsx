@@ -23,9 +23,7 @@ export async function generateStaticParams() {
         if (!response.ok) throw new Error(`Failed to fetch chapters: ${response.status}`);
 
         const data = await response.json();
-        const { chapters } = data;
-        
-        return chapters.map((chapter: Chapter) => ({
+        return data.chapters.map((chapter: Chapter) => ({
             surahNumber: chapter.id.toString(),
         }));
 
@@ -41,7 +39,6 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: any): Promise<Metadata> {    // eslint-disable-line @typescript-eslint/no-explicit-any
     try {
         const response = await fetch(`${process.env.API_END_POINT}/chapters/${params.surahNumber}`);
-
         if (!response.ok) return { title: `Surah ${params.surahNumber}` };
 
         const data = await response.json();
@@ -59,52 +56,70 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {    
 export default async function SurahPage({ params }: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any  
     const token = await getAccessToken();
 
-    console.log("Surah page: ", params.surahNumber);
-    
     try {
-        const response = await fetch(
-            `${process.env.API_END_POINT}/chapters/${params.surahNumber}`,
-            {
+        const [chapterRes, versesRes, infoRes] = await Promise.all([
+            fetch(`${process.env.API_END_POINT}/chapters/${params.surahNumber}`, {
                 headers: {
                     Accept: 'application/json',
                     'x-auth-token': token,
                     'x-client-id': process.env.CLIENT_ID!,
-                },
-                next: { revalidate }
-            }
-        );
+                }, next: { revalidate }
+            }),
+            fetch(`${process.env.API_END_POINT}/verses/by_chapter/${params.surahNumber}?translations=131`, {
+                headers: {
+                    Accept: 'application/json',
+                    'x-auth-token': token,
+                    'x-client-id': process.env.CLIENT_ID!,
+                }, next: { revalidate }
+            }), // adjust translation ID
+            fetch(`${process.env.API_END_POINT}/chapters/${params.surahNumber}/info`, {
+                headers: {
+                    Accept: 'application/json',
+                    'x-auth-token': token,
+                    'x-client-id': process.env.CLIENT_ID!,
+                }, next: { revalidate }
+            }),
+        ]);
 
-        if (!response.ok) {
-            if (response.status === 404) notFound();
-            throw new Error(`Failed to fetch surah data: ${response.status}`);
-        }
+        if (!chapterRes.ok || !versesRes.ok || !infoRes.ok) notFound();
 
-        const data = await response.json();
-        console.log("second api calling: ", data);
-        
-        const chapter = data.chapter as Chapter;
+        const chapterData = await chapterRes.json();
+        const versesData = await versesRes.json();
+        const infoData = await infoRes.json();
+
+        const chapter: Chapter = chapterData.chapter;
+        const verses: Verse[] = versesData.verses;
+        const info: ChapterInfo = infoData.chapter_info;
+
         if (!chapter) notFound();
 
-        return (
-            <div className="p-6">
-                <h1 className="text-2xl font-bold text-center">
-                    Surah {chapter.id} - {chapter.name_simple}
-                </h1>
-                <p className="text-center text-gray-500 mt-2">
-                    {chapter.translated_name.name} ({chapter.name_arabic})
-                </p>
+        console.log("chapter data: ", chapter);
+        console.log("verses data: ", verses);
+        console.log("info data: ", info);
 
-                <div className="mt-6">
-                    <p className="text-center">{chapter.revelation_place} • {chapter.verses_count} verses</p>
+        return (
+            <div className="p-6 space-y-8">
+                <div className="text-center space-y-1">
+                    <h1 className="text-2xl font-bold">Surah {chapter.id} - {chapter.name_simple}</h1>
+                    <p className="text-gray-500">{chapter.translated_name.name} ({chapter.name_arabic})</p>
+                    <p className="text-sm">{chapter.revelation_place} • {chapter.verses_count} verses</p>
                     {chapter.bismillah_pre && (
-                        <p className="text-center text-xl mt-4 font-arabic">
+                        <p className="text-xl font-arabic mt-4">
                             بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ
                         </p>
                     )}
                 </div>
 
-                <div>
-                    <div>verses and translation here</div>
+                <div className="prose max-w-none text-justify" dangerouslySetInnerHTML={{ __html: info.text }} />
+
+                <div className="space-y-6">
+                    {verses.map((verse) => (
+                        <div key={verse.id} className="border-b pb-4">
+                            <p className="text-right font-arabic text-2xl">{verse.text_uthmani}</p>
+                            <p className="text-sm mt-2">{verse.translations?.[0]?.text}</p>
+                            <p className="text-xs text-gray-500 text-right mt-1">({verse.verse_key})</p>
+                        </div>
+                    ))}
                 </div>
             </div>
         );
