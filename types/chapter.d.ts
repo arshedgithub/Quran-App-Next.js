@@ -1,0 +1,13 @@
+interface Chapter {
+    id: number;
+    name_simple: string;
+    name_arabic: string;
+    revelation_place: string;
+    revelation_order: string;
+    verses_count: number;
+    bismillah_pre: boolean;
+    translated_name: {
+        name: string;
+        language_name: string
+    };
+}

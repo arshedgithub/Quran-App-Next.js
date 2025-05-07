@@ -4,7 +4,7 @@ import { Globe, Menu, Search, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-export function SidebarLayout({ chapters, children }: { chapters: any[], children: React.ReactNode }) {
+export function SidebarLayout({ chapters, children }: { chapters: Chapter[], children: React.ReactNode }) {
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     return (
@@ -40,9 +40,9 @@ export function SidebarLayout({ chapters, children }: { chapters: any[], childre
                         </button>
                         <h2 className="text-2xl font-semibold mb-4">Chapters</h2>
                         <ul className="space-y-4">
-                            {chapters.map((chapter: any) => (
+                            {chapters.map((chapter: Chapter) => (
                                 <li key={chapter.id}>
-                                    <Link href={`/surah-${chapter.slug}`} className="block">
+                                    <Link href={`/surah/${chapter.id}`} className="block">
                                         <div className="text-xl font-bold text-right">{chapter.name_arabic}</div>
                                         <div className="text-sm font-medium">{chapter.id} - {chapter.name_simple}</div>
                                         <div className="text-xs text-gray-500 italic">

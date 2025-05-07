@@ -1,4 +1,4 @@
-const axios = require('axios');
+import axios from "axios";
 
 export async function getAccessToken(): Promise<string> {
     const clientId = process.env.CLIENT_ID;
@@ -8,7 +8,7 @@ export async function getAccessToken(): Promise<string> {
     try {
         const response = await axios({
             method: 'post',
-            url: 'https://oauth2.quran.foundation/oauth2/token',
+            url: process.env.TOKEN_END_POINT,
             headers: {
                 'Authorization': `Basic ${auth}`,
                 'Content-Type': 'application/x-www-form-urlencoded'
