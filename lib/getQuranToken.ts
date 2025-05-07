@@ -1,14 +1,14 @@
 const axios = require('axios');
 
 export async function getAccessToken(): Promise<string> {
-    const clientId = process.env.TEST_CLIENT_ID;
-    const clientSecret = process.env.TEST_CLIENT_SECRET;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
     try {
         const response = await axios({
             method: 'post',
-            url: 'https://prelive-oauth2.quran.foundation/oauth2/token',
+            url: 'https://oauth2.quran.foundation/oauth2/token',
             headers: {
                 'Authorization': `Basic ${auth}`,
                 'Content-Type': 'application/x-www-form-urlencoded'
