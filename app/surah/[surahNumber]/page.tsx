@@ -1,29 +1,18 @@
-import { getAccessToken } from "@/lib";
+import { apiFetch } from "@/lib";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-
-export const revalidate = 1209600; // Revalidate once a 14 days (86400 * 14)
 
 // Ensure static generation for all chapter paths
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-    const token = await getAccessToken();
-
     try {
-        const response = await fetch(`${process.env.API_END_POINT}/chapters`, {
-            headers: {
-                Accept: 'application/json',
-                'x-auth-token': token,
-                'x-client-id': process.env.CLIENT_ID!,
-            },
-            next: { revalidate }
-        });
+        const chapterData = await apiFetch<{ chapter: Chapter[] }>(`/chapters`, { revalidate: 2592000 });  // 30 days
+        const chapter_list: Chapter[] = chapterData.chapter;
 
-        if (!response.ok) throw new Error(`Failed to fetch chapters: ${response.status}`);
+        if (!chapter_list) throw new Error(`Failed to fetch chapters...`);
 
-        const data = await response.json();
-        return data.chapters.map((chapter: Chapter) => ({
+        return chapter_list.map((chapter: Chapter) => ({
             surahNumber: chapter.id.toString(),
         }));
 
@@ -38,12 +27,10 @@ export async function generateStaticParams() {
 // Generate metadata for the page
 export async function generateMetadata({ params }: any): Promise<Metadata> {    // eslint-disable-line @typescript-eslint/no-explicit-any
     try {
-        const response = await fetch(`${process.env.API_END_POINT}/chapters/${params.surahNumber}`);
-        if (!response.ok) return { title: `Surah ${params.surahNumber}` };
+        const chapterData = await apiFetch<{ chapter: Chapter }>(`/chapters/${params.surahNumber}`);
+        if (!chapterData) return { title: `Surah ${params.surahNumber}` };
 
-        const data = await response.json();
-        const chapter = data.chapter as Chapter;
-
+        const chapter = chapterData.chapter as Chapter;
         return {
             title: `Surah ${chapter.name_simple} (${chapter.id})`,
             description: `Read and listen to Surah ${chapter.name_simple} - ${chapter.translated_name.name}`,
@@ -54,48 +41,18 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {    
 }
 
 export default async function SurahPage({ params }: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any  
-    const token = await getAccessToken();
-
     try {
-        const [chapterRes, versesRes, infoRes] = await Promise.all([
-            fetch(`${process.env.API_END_POINT}/chapters/${params.surahNumber}`, {
-                headers: {
-                    Accept: 'application/json',
-                    'x-auth-token': token,
-                    'x-client-id': process.env.CLIENT_ID!,
-                }, next: { revalidate }
-            }),
-            fetch(`${process.env.API_END_POINT}/verses/by_chapter/${params.surahNumber}?translations=131`, {
-                headers: {
-                    Accept: 'application/json',
-                    'x-auth-token': token,
-                    'x-client-id': process.env.CLIENT_ID!,
-                }, next: { revalidate }
-            }), // adjust translation ID
-            fetch(`${process.env.API_END_POINT}/chapters/${params.surahNumber}/info`, {
-                headers: {
-                    Accept: 'application/json',
-                    'x-auth-token': token,
-                    'x-client-id': process.env.CLIENT_ID!,
-                }, next: { revalidate }
-            }),
-        ]);
+        const { surahNumber } = params;
 
-        if (!chapterRes.ok || !versesRes.ok || !infoRes.ok) notFound();
-
-        const chapterData = await chapterRes.json();
-        const versesData = await versesRes.json();
-        const infoData = await infoRes.json();
+        const chapterData = await apiFetch<{ chapter: Chapter }>(`/chapters/${surahNumber}`);
+        const versesData = await apiFetch<{ verses: Verse[] }>(`/verses/by_chapter/${surahNumber}?translations=131`);
+        const infoData = await apiFetch<{ chapter_info: ChapterInfo }>(`/chapters/${surahNumber}/info`, { revalidate: 1209600 }); // 14 days
 
         const chapter: Chapter = chapterData.chapter;
         const verses: Verse[] = versesData.verses;
         const info: ChapterInfo = infoData.chapter_info;
 
-        if (!chapter) notFound();
-
-        console.log("chapter data: ", chapter);
-        console.log("verses data: ", verses);
-        console.log("info data: ", info);
+        if (!chapter || !verses || !info) notFound();
 
         return (
             <div className="p-6 space-y-8">
@@ -124,7 +81,7 @@ export default async function SurahPage({ params }: any) {  // eslint-disable-li
             </div>
         );
     } catch (error: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any
-        console.error("Error fetching surah:", error);
+        console.error("Error fetching surah: ", error);
         return (
             <div className="p-6 text-center">
                 <h1 className="text-2xl font-bold">Error loading Surah {params.surahNumber}</h1>
