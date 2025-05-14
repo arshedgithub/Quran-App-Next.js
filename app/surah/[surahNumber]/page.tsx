@@ -2,6 +2,7 @@ import { apiFetch } from "@/lib";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import VerseList from "./verseList";
 
 export const dynamic = "force-dynamic";
 
@@ -84,15 +85,8 @@ export default async function SurahPage({ params }: any) {  // eslint-disable-li
                     )}
                 </div>
 
-                <div className="space-y-6">
-                    {verses.map((verse) => (
-                        <div key={verse.id} className="border-b pb-4">
-                            <p className="text-right font-arabic text-5xl">{verse.text_uthmani}</p>
-                            <p className="text-lg mt-2">{verse.translations?.[0]?.text}</p>
-                            <p className="text-xs text-gray-500 text-right mt-1">({verse.verse_key})</p>
-                        </div>
-                    ))}
-                </div>
+                <VerseList verses={verses} />
+                
             </div>
         );
     } catch (error: any) {  // eslint-disable-line @typescript-eslint/no-explicit-any

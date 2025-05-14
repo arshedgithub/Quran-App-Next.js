@@ -1,5 +1,5 @@
 import './globals.css';
-import { SidebarLayout } from '@/components';
+import { Layout } from '@/components';
 import { apiFetch } from '@/lib';
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -9,7 +9,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className="bg-white text-gray-800">
-        <SidebarLayout chapters={chaptersData.chapters}>{children}</SidebarLayout>
+        <Layout chapters={chaptersData.chapters}>{children}</Layout>
       </body>
     </html>
   );

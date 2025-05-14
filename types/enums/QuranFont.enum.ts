@@ -1,4 +1,4 @@
-export enum ARABIC_STYLES {
+export enum QURAN_FONTS {
     UTHMANI,
     IMLAEI,
     INDOPAK,
