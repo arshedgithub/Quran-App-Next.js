@@ -5,6 +5,9 @@ import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
+const arabicTextStyles = 'text_uthmani,text_imlaei,text_indopak,text_uthmani_simple,text_uthmani_tajweed'
+const translations = 131
+
 export async function generateStaticParams() {
     try {
         const chapterData = await apiFetch<{ chapters: Chapter[] }>(`/chapters`, { revalidate: 2592000 });  // 30 days
@@ -47,13 +50,13 @@ export default async function SurahPage({ params }: any) {  // eslint-disable-li
         const { surahNumber } = params;
 
         const chapterData = await apiFetch<{ chapter: Chapter }>(`/chapters/${surahNumber}`);
-        const versesData = await apiFetch<{ verses: Verse[] }>(`/verses/by_chapter/${surahNumber}?translations=131`);
+        const versesData = await apiFetch<{ verses: Verse[] }>(`/verses/by_chapter/${surahNumber}?words=true&word_fields=${arabicTextStyles}&translations=${translations}&translation_fields=text&fields=${arabicTextStyles}`);
 
         const chapter: Chapter = chapterData.chapter;
         const verses: Verse[] = versesData.verses;
 
         verses.forEach(verse => {
-            console.log("Uthmani Text: ", verse.text_uthmani, " translation: ", verse.translations, " simple: ", verse.text_uthmani_simple, " imlae: ", verse.text_imlae, " imlae simple: ", verse.text_imlae_simple);
+            console.log("Uthmani Text: ", verse.text_uthmani, " translation: ", verse.translations, " simple: ", verse.text_uthmani_simple, " imlae: ", verse.text_imlaei, " imlae simple: ", verse.text_imlaei_simple);
             console.log(verse.words.forEach(word => (word.position, word.translation, word.transliteration)));
         });
 
@@ -84,9 +87,9 @@ export default async function SurahPage({ params }: any) {  // eslint-disable-li
                 <div className="space-y-6">
                     {verses.map((verse) => (
                         <div key={verse.id} className="border-b pb-4">
-                            Arabic: <p className="text-right font-arabic text-2xl">{verse.text_uthmani}</p>
-                            <p className="text-sm mt-2">{verse.translations?.[0]?.text}</p>
-                            key: <p className="text-xs text-gray-500 text-right mt-1">({verse.verse_key})</p>
+                            <p className="text-right font-arabic text-5xl">{verse.text_uthmani}</p>
+                            <p className="text-lg mt-2">{verse.translations?.[0]?.text}</p>
+                            <p className="text-xs text-gray-500 text-right mt-1">({verse.verse_key})</p>
                         </div>
                     ))}
                 </div>

@@ -17,8 +17,9 @@ interface Verse {
     verse_number: number;
     text_uthmani: string;
     text_uthmani_simple: string;
-    text_imlae: string;
-    text_imlae_simple: string;
+    text_imlaei: string;
+    text_imlaei_simple: string;
+    text_indopak: string;
     verse_key: string;
     translations: { text: string }[];
     words: Word[]

@@ -1,0 +1,6 @@
+export enum ARABIC_STYLES {
+    UTHMANI,
+    IMLAEI,
+    INDOPAK,
+    UTHMANI_TAJWEED
+}
