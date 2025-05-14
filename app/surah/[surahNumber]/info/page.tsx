@@ -1,9 +1,9 @@
 import { apiFetch } from "@/lib";
-import { Link } from "lucide-react";
 import { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const dynamicParams = false;
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
     return Array.from({ length: 114 }, (_, i) => ({
@@ -47,11 +47,11 @@ export default async function SurahInfoPage({ params }: any) {  // eslint-disabl
                         {chapter.revelation_place === "makkah" ? "🕋" : "🕌"}
                         {chapter.revelation_place.charAt(0).toUpperCase() + chapter.revelation_place.slice(1)} • {chapter.verses_count} verses
                     </p>
-                </div>
 
-                <Link href={`/surah/${chapter.id}`} className="text-blue-600 hover:underline text-sm">
-                    Go to Surah {chapter.name_simple} reading
-                </Link>
+                    <Link href={`/surah/${chapter.id}`} className="text-blue-600 hover:underline text-sm">
+                        Go to Surah {chapter.name_simple} reading
+                    </Link>
+                </div>
 
                 <div className="prose max-w-none text-justify" dangerouslySetInnerHTML={{ __html: info.text }} />
             </div>

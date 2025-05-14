@@ -1,6 +1,6 @@
 "use client"
 
-import { Globe, Menu, Search, X } from "lucide-react";
+import { Globe, Menu, Search, Settings, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -18,11 +18,17 @@ export function SidebarLayout({ chapters, children }: { chapters: Chapter[], chi
                     <span className="text-lg font-semibold">Sri - Quran</span>
                 </div>
                 <div className="flex items-center space-x-4 text-xl">
-                    <button title="Change Language">
-                        <Globe size={20} />
-                    </button>
                     <button title="Search">
                         <Search size={20} />
+                    </button>
+                    
+                    <button title="Translation">
+                        <Globe size={20} />
+                    </button>
+                    <div>English</div>
+
+                    <button title="Settings">
+                        <Settings size={20} />
                     </button>
                 </div>
             </header>

@@ -1,19 +1,20 @@
 import { apiFetch } from "@/lib";
-import { Link } from "lucide-react";
 import { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// Ensure static generation for all chapter paths
-export const dynamicParams = false;
+export const dynamic = "force-dynamic";
 
 export async function generateStaticParams() {
     try {
-        const chapterData = await apiFetch<{ chapter: Chapter[] }>(`/chapters`, { revalidate: 2592000 });  // 30 days
-        const chapter_list: Chapter[] = chapterData.chapter;
+        const chapterData = await apiFetch<{ chapters: Chapter[] }>(`/chapters`, { revalidate: 2592000 });  // 30 days
+        const chapters: Chapter[] = chapterData.chapters;
 
-        if (!chapter_list) throw new Error(`Failed to fetch chapters...`);
+        console.log("chapters in genStaticParams: ", chapters.length);
 
-        return chapter_list.map((chapter: Chapter) => ({
+        if (!chapters) throw new Error(`Failed to fetch chapters...`);
+
+        return chapters.map((chapter: Chapter) => ({
             surahNumber: chapter.id.toString(),
         }));
 
@@ -51,6 +52,11 @@ export default async function SurahPage({ params }: any) {  // eslint-disable-li
         const chapter: Chapter = chapterData.chapter;
         const verses: Verse[] = versesData.verses;
 
+        verses.forEach(verse => {
+            console.log("Uthmani Text: ", verse.text_uthmani, " translation: ", verse.translations, " simple: ", verse.text_uthmani_simple, " imlae: ", verse.text_imlae, " imlae simple: ", verse.text_imlae_simple);
+            console.log(verse.words.forEach(word => (word.position, word.translation, word.transliteration)));
+        });
+
         if (!chapter || !verses) notFound();
 
         return (
@@ -78,9 +84,9 @@ export default async function SurahPage({ params }: any) {  // eslint-disable-li
                 <div className="space-y-6">
                     {verses.map((verse) => (
                         <div key={verse.id} className="border-b pb-4">
-                            <p className="text-right font-arabic text-2xl">{verse.text_uthmani}</p>
+                            Arabic: <p className="text-right font-arabic text-2xl">{verse.text_uthmani}</p>
                             <p className="text-sm mt-2">{verse.translations?.[0]?.text}</p>
-                            <p className="text-xs text-gray-500 text-right mt-1">({verse.verse_key})</p>
+                            key: <p className="text-xs text-gray-500 text-right mt-1">({verse.verse_key})</p>
                         </div>
                     ))}
                 </div>

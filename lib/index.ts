@@ -1,2 +1,2 @@
-export * from './getQuranToken'
+// export * from './getAccessToken'
 export * from './api'
